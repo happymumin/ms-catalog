@@ -7,7 +7,9 @@ import com.musinsa.catalog.presentation.category.dto.CategoryResponse
 import com.musinsa.catalog.presentation.dto.Response
 import com.musinsa.catalog.presentation.dto.wrapOk
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -20,6 +22,12 @@ class CategoryController(private val service: CategoryService) {
     fun createCategory(@RequestBody request: CategoryRequest): Response.Ok<CategoryResponse> {
         val category = service.createCategory(request)
         return CategoryResponse(category.id!!).wrapOk()
+    }
+
+    @PutMapping("/api/v1/categories/{cid}")
+    fun updateCategory(@PathVariable cid: Int, @RequestBody request: CategoryRequest): Response.Ok<Unit> {
+        service.updateCategory(cid, request)
+        return Response.Ok.empty()
     }
 
     @GetMapping("/api/v1/categories")

@@ -30,7 +30,7 @@ class CategoryTree(
     }
 
     private fun buildTree(categories: List<Category>): Map<String, CategoryNode> {
-        val nodesByCode = categories.associate { category ->
+        val nodesByCode = categories.sortedBy { it.code.toBigDecimal() }.associate { category ->
             category.code to CategoryNode(category.id!!, category.code, category.name)
         }.toMutableMap()
 

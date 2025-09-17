@@ -12,7 +12,7 @@ spring:
       replace: none
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:mem:testdb;MODE=MySQL
     hikari:
       minimum-idle: 1
       maximum-pool-size: 2

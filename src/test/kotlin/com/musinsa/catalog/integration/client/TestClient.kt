@@ -20,6 +20,15 @@ class TestClient(private val client: WebClient) {
             .data
     }
 
+    fun updateCategory(cid: Int, request: CategoryRequest) {
+        client.put()
+            .uri("/api/v1/categories/$cid")
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono<Response.Ok<Unit>>()
+            .block()
+    }
+
     fun getCategories(cid: Int? = null): CategoryListResponse {
         return client.get()
             .uri { builder ->

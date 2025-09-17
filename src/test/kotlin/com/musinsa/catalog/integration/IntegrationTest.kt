@@ -7,10 +7,13 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment
 import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.test.context.TestConstructor
+import org.springframework.test.context.TestConstructor.AutowireMode
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import kotlin.test.assertTrue
 
+@TestConstructor(autowireMode = AutowireMode.ALL)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 abstract class IntegrationTest {
