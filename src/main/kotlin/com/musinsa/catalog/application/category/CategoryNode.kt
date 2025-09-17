@@ -5,20 +5,20 @@ import com.musinsa.catalog.domain.category.Category
 class CategoryTree(
     categories: List<Category>
 ) {
-    private val root = CategoryNode.root()
+    private val root: Map<String, CategoryNode>
     private val categoryCodeById = categories.associate { it.id to it.code }
 
     init {
-        buildTree(categories)
+        root = buildTree(categories)
     }
 
-    fun getRootTree(): Map<String, CategoryNode> = root.children
+    fun getRootTree(): Map<String, CategoryNode> = root
 
     fun findSubTree(cid: Int): CategoryNode? {
         val categoryCode = categoryCodeById[cid] ?: return null
         val codes = categoryCode.chunked(CATEGORY_CODE_SIZE)
 
-        var currentMap = root.children
+        var currentMap = root
         var node: CategoryNode? = null
 
         for (code in codes) {
@@ -29,27 +29,26 @@ class CategoryTree(
         return node
     }
 
-    private fun buildTree(categories: List<Category>) {
-        val rootMap = root.children
+    private fun buildTree(categories: List<Category>): Map<String, CategoryNode> {
+        val nodesByCode = categories.associate { category ->
+            category.code to CategoryNode(category.id!!, category.code, category.name)
+        }.toMutableMap()
 
-        for (category in categories) {
-            val codes: List<String> = category.code.chunked(CATEGORY_CODE_SIZE)
+        categories.filter { getDepth(it.code) != 1 }.forEach { category ->
+            val childCode = category.code
+            val parentCode = childCode.dropLast(CATEGORY_CODE_SIZE)
+            val lastSegment = childCode.takeLast(CATEGORY_CODE_SIZE)
 
-            var currentMap = rootMap
-            var path = ""
-
-            for ((depth, code) in codes.withIndex()) {
-                path += code
-                if (depth == codes.lastIndex) {
-                    currentMap.putIfAbsent(code, CategoryNode(category.id!!, category.code, category.name))
-                } else {
-                    val node = currentMap.getOrPut(code) {
-                        CategoryNode(-1, category.code, "dummy")
-                    }
-                    currentMap = node.children
-                }
-            }
+            // 부모 노드 -> 자식 노드 연결
+            nodesByCode.getValue(parentCode).children[lastSegment] = nodesByCode.getValue(childCode)
         }
+
+        // 루트 노드만 필터링
+        return nodesByCode.filterValues { getDepth(it.code) == 1 }
+    }
+
+    private fun getDepth(code: String): Int {
+        return code.length / CATEGORY_CODE_SIZE
     }
 }
 
