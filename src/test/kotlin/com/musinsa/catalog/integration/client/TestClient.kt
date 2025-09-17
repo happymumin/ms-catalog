@@ -1,5 +1,6 @@
 package com.musinsa.catalog.integration.client
 
+import com.musinsa.catalog.presentation.category.dto.CategoryListResponse
 import com.musinsa.catalog.presentation.category.dto.CategoryRequest
 import com.musinsa.catalog.presentation.category.dto.CategoryResponse
 import com.musinsa.catalog.presentation.dto.Response
@@ -15,6 +16,21 @@ class TestClient(private val client: WebClient) {
             .bodyValue(request)
             .retrieve()
             .bodyToMono<Response.Ok<CategoryResponse>>()
+            .block()!!
+            .data
+    }
+
+    fun getCategories(cid: Int? = null): CategoryListResponse {
+        return client.get()
+            .uri { builder ->
+                builder.path("/api/v1/categories")
+                if (cid != null) {
+                    builder.queryParam("cid", cid)
+                }
+                builder.build()
+            }
+            .retrieve()
+            .bodyToMono<Response.Ok<CategoryListResponse>>()
             .block()!!
             .data
     }

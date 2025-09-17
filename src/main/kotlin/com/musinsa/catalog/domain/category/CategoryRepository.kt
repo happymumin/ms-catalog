@@ -9,4 +9,7 @@ interface CategoryRepository : JpaRepository<Category, Int> {
 
     @Transactional(readOnly = true)
     fun findByIdAndEnabledTrue(id: Int): Category?
+
+    @Transactional(readOnly = true)
+    fun findAllByEnabledTrue(): List<Category>
 }
