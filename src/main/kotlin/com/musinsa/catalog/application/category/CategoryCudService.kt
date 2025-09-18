@@ -1,33 +1,21 @@
 package com.musinsa.catalog.application.category
 
-import com.musinsa.catalog.domain.category.model.CategoryCode
 import com.musinsa.catalog.common.exception.badRequestException
 import com.musinsa.catalog.common.exception.notFoundException
 import com.musinsa.catalog.domain.category.Category
 import com.musinsa.catalog.domain.category.CategoryRepository
+import com.musinsa.catalog.domain.category.model.CategoryCode
 import com.musinsa.catalog.presentation.category.dto.CategoryRequest
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class CategoryService(
+class CategoryCudService(
     private val repository: CategoryRepository,
 ) {
 
-    fun findCategories(cid: Int): CategoryNode? {
-        return getCategoryTree().findSubTree(cid)
-    }
-
-    fun getAllCategories(): List<CategoryNode> {
-        return getCategoryTree().getRootTree().values.toList()
-    }
-
-    private fun getCategoryTree(): CategoryTree {
-        return CategoryTree(repository.findAllByEnabledTrue())
-    }
-
-    fun createCategory(request: CategoryRequest): Category {
+    fun create(request: CategoryRequest): Category {
         val parentCategory = request.parentId?.let {
             repository.findByIdAndEnabledTrue(it) ?: throw badRequestException("잘못된 부모 카테고리입니다.")
         }
@@ -47,7 +35,16 @@ class CategoryService(
     }
 
     @Transactional
-    fun updateCategory(cid: Int, request: CategoryRequest) {
+    fun delete(cid: Int) {
+        val category = repository.findByIdAndEnabledTrue(cid) ?: throw notFoundException("존재하지 않는 카테고리입니다.")
+        if (repository.countByCodeStartsWithAndEnabledTrue(category.code.value) > 1) {
+            throw badRequestException("리프 카테고리만 제거 가능합니다.")
+        }
+        category.enabled = false
+    }
+
+    @Transactional
+    fun update(cid: Int, request: CategoryRequest) {
         val category = repository.findByIdAndEnabledTrue(cid) ?: throw notFoundException("존재하지 않는 카테고리입니다.")
 
         val parentCategory: Category? = request.parentId?.let { parentId ->
@@ -90,15 +87,5 @@ class CategoryService(
         }
         if (updatedCount != 1) throw badRequestException("code 변경에 실패했습니다.")
     }
-
-    @Transactional
-    fun deleteCategory(cid: Int) {
-        val category = repository.findByIdAndEnabledTrue(cid) ?: throw notFoundException("존재하지 않는 카테고리입니다.")
-        if (repository.countByCodeStartsWithAndEnabledTrue(category.code.value) > 1) {
-            throw badRequestException("리프 카테고리만 제거 가능합니다.")
-        }
-        category.enabled = false
-    }
-
 
 }
