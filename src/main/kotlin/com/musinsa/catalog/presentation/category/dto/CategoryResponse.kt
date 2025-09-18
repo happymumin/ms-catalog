@@ -1,6 +1,7 @@
 package com.musinsa.catalog.presentation.category.dto
 
 import com.musinsa.catalog.application.category.CategoryNode
+import com.musinsa.catalog.domain.category.model.CategoryCode
 
 data class CategoryResponse(
     val cid: Int
@@ -12,7 +13,7 @@ data class CategoryListResponse(
 
     data class Category(
         val cid: Int,
-        val code: String,
+        val code: CategoryCode,
         val name: String,
         val list: List<Category>
     ) {

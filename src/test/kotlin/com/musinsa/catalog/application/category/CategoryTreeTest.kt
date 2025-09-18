@@ -1,5 +1,6 @@
 package com.musinsa.catalog.application.category
 
+import com.musinsa.catalog.domain.category.model.CategoryCode
 import com.musinsa.catalog.domain.category.Category
 import com.musinsa.catalog.util.SimpleCategory
 import org.assertj.core.api.Assertions.assertThat
@@ -92,12 +93,12 @@ class CategoryTreeTest {
     }
 
     private fun category(id: Int, parentId: Int?, code: String, name: String): Category {
-        return Category(id, parentId, code, "", true)
+        return Category(id, parentId, CategoryCode(code), "", true)
     }
 
     private fun CategoryNode.simplify(): SimpleCategory {
         return SimpleCategory(
-            code = code,
+            code = code.value,
             list = children.map { it.value.simplify() }
         )
     }

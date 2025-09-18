@@ -1,9 +1,9 @@
 package com.musinsa.catalog.domain.category
 
+import com.musinsa.catalog.domain.category.model.CategoryCode
 import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
-import org.springframework.data.domain.Persistable
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
 
@@ -21,7 +21,7 @@ data class Category(
     val parentId: Int? = null,
 
     @Column(nullable = false, unique = true)
-    val code: String,
+    val code: CategoryCode,
 
     @Column(nullable = false)
     val name: String,
@@ -38,3 +38,4 @@ data class Category(
     @Column(name = "modified_at", nullable = false)
     lateinit var modifiedAt: LocalDateTime
 }
+
