@@ -7,6 +7,7 @@ import com.musinsa.catalog.util.SimpleCategory
 import jakarta.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
@@ -18,6 +19,7 @@ class CategoryIntegrationTest(private val repository: CategoryRepository) : Inte
     fun beforeEach() {
         repository.deleteAll()
     }
+
 
     @Test
     fun `카테고리를 등록하고 조회한다`() {
@@ -68,7 +70,7 @@ class CategoryIntegrationTest(private val repository: CategoryRepository) : Inte
     }
 
     @Test
-    fun `카테고리를 수정한다`() {
+    fun `카테고리를 등록하고 수정한다`() {
         // 카테고리 등록
         val womenOuterId = client.createCategory(CategoryRequest("100", "여성 의류"))
             .let { depth1 ->
@@ -120,6 +122,29 @@ class CategoryIntegrationTest(private val repository: CategoryRepository) : Inte
         // 코드 중복 시 에러
         assertBadRequest {
             client.updateCategory(womenOuterId, CategoryRequest("100", "여성 의류2"))
+        }
+    }
+
+    @Test
+    fun `카테고리를 등록하고 삭제한다`() {
+        val (depth1, depth2) = client.createCategory(CategoryRequest("100", "여성 의류"))
+            .let { depth1 ->
+                depth1 to client.createCategory(CategoryRequest("200", "외투", depth1.cid))
+            }
+
+        // 리프 카테고리가 아니면 삭제 불가
+        assertBadRequest {
+            client.deleteCategory(depth1.cid)
+        }
+
+        // 리프 카테고리 삭제
+        assertDoesNotThrow {
+            client.deleteCategory(depth2.cid)
+        }
+
+        // 기존 자식 카테고리가 삭제되어 리프 카테고리로 전환 -> 삭제 가능
+        assertDoesNotThrow {
+            client.deleteCategory(depth1.cid)
         }
     }
 

@@ -90,4 +90,14 @@ class CategoryService(
         if (updatedCount != 1) throw badRequestException("code 변경에 실패했습니다.")
     }
 
+    @Transactional
+    fun deleteCategory(cid: Int) {
+        val category = repository.findByIdAndEnabledTrue(cid) ?: throw notFoundException("존재하지 않는 카테고리입니다.")
+        if (repository.countByCodeStartsWithAndEnabledTrue(category.code) > 1) {
+            throw badRequestException("리프 카테고리만 제거 가능합니다.")
+        }
+        category.enabled = false
+    }
+
+
 }

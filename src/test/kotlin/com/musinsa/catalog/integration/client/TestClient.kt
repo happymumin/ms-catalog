@@ -29,6 +29,14 @@ class TestClient(private val client: WebClient) {
             .block()
     }
 
+    fun deleteCategory(cid: Int) {
+        client.delete()
+            .uri("/api/v1/categories/$cid")
+            .retrieve()
+            .bodyToMono<Response.Ok<Unit>>()
+            .block()
+    }
+
     fun getCategories(cid: Int? = null): CategoryListResponse {
         return client.get()
             .uri { builder ->

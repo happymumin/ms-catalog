@@ -27,7 +27,7 @@ data class Category(
     val name: String,
 
     @Column(nullable = false)
-    val enabled: Boolean
+    var enabled: Boolean
 ) {
 
     @CreatedDate

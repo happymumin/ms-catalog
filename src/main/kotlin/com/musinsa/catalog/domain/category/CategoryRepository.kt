@@ -19,6 +19,9 @@ interface CategoryRepository : JpaRepository<Category, Int> {
     @Transactional(readOnly = true)
     fun findAllByCodeStartsWithAndEnabledTrue(code: String): List<Category>
 
+    @Transactional(readOnly = true)
+    fun countByCodeStartsWithAndEnabledTrue(code: String): Int
+
     @Transactional
     @Modifying
     @Query(

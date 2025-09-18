@@ -6,6 +6,7 @@ import com.musinsa.catalog.presentation.category.dto.CategoryRequest
 import com.musinsa.catalog.presentation.category.dto.CategoryResponse
 import com.musinsa.catalog.presentation.dto.Response
 import com.musinsa.catalog.presentation.dto.wrapOk
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -27,6 +28,12 @@ class CategoryController(private val service: CategoryService) {
     @PutMapping("/api/v1/categories/{cid}")
     fun updateCategory(@PathVariable cid: Int, @RequestBody request: CategoryRequest): Response.Ok<Unit> {
         service.updateCategory(cid, request)
+        return Response.Ok.empty()
+    }
+
+    @DeleteMapping("/api/v1/categories/{cid}")
+    fun deleteCategory(@PathVariable cid: Int): Response.Ok<Unit> {
+        service.deleteCategory(cid)
         return Response.Ok.empty()
     }
 

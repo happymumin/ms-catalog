@@ -16,13 +16,13 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(AppException::class)
     fun handle(e: AppException): ResponseEntity<Response.Error> {
-        logger.warn { e }
+        logger.debug { e }
         return ResponseEntity.status(e.httpStatus).body(Response.Error(e.message))
     }
 
     @ExceptionHandler(HttpMessageNotReadableException::class)
     fun handle(e: HttpMessageNotReadableException): ResponseEntity<Response.Error> {
-        logger.warn { e }
+        logger.debug { e }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Response.Error(BAD_REQUEST_MESSAGE))
     }
 
