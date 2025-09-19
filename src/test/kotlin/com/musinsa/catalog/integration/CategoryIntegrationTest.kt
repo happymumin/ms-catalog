@@ -1,7 +1,7 @@
 package com.musinsa.catalog.integration
 
-import com.musinsa.catalog.domain.category.model.CategorySegmentCode
 import com.musinsa.catalog.domain.category.CategoryRepository
+import com.musinsa.catalog.domain.category.model.CategorySegmentCode
 import com.musinsa.catalog.presentation.category.dto.CategoryListResponse
 import com.musinsa.catalog.presentation.category.dto.CategoryRequest
 import com.musinsa.catalog.util.SimpleCategory

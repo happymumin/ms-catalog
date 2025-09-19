@@ -1,10 +1,10 @@
 package com.musinsa.catalog.application.category
 
-import com.musinsa.catalog.domain.category.model.CategoryCode
 import com.musinsa.catalog.domain.category.Category
+import com.musinsa.catalog.domain.category.model.CategoryCode
 import com.musinsa.catalog.util.SimpleCategory
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
 class CategoryTreeTest {

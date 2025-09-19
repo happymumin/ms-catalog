@@ -17,8 +17,8 @@ class RedisTemplateCacheService(
             logger.debug { "read cache from redis. key: ${key.key}" }
             val value = stringRedisTemplate.opsForValue().get(key.key) ?: return null
             objectMapper.readValue(value, key.type)
-        } catch (e: Exception) {
-            logger.error(e) { "failed to read cache from redis. key: ${key.key}" }
+        } catch (e: Throwable) {
+            logger.error(e) { "failed to read cache from redis. e: $e key: ${key.key}" }
             return null
         }
     }
@@ -29,8 +29,8 @@ class RedisTemplateCacheService(
             stringRedisTemplate
                 .opsForValue()
                 .set(key.key, objectMapper.writeValueAsString(value), key.timeout.toJavaDuration())
-        } catch (e: Exception) {
-            logger.error(e) { "failed to set cache from redis. key: ${key.key}" }
+        } catch (e: Throwable) {
+            logger.error(e) { "failed to set cache from redis. e: $e key: ${key.key}" }
         }
     }
 
@@ -38,8 +38,8 @@ class RedisTemplateCacheService(
         try {
             logger.debug { "invalidate cache from redis. key: ${key.key}" }
             stringRedisTemplate.delete(key.key)
-        } catch (e: Exception) {
-            logger.error(e) { "failed to invalidate cache from redis. key: ${key.key}" }
+        } catch (e: Throwable) {
+            logger.error(e) { "failed to invalidate cache from redis. e: $e key: ${key.key}" }
         }
     }
 }

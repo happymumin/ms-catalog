@@ -5,7 +5,6 @@ import com.musinsa.catalog.presentation.category.dto.CategoryRequest
 import com.musinsa.catalog.presentation.category.dto.CategoryResponse
 import com.musinsa.catalog.presentation.dto.Response
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.awaitBody
 import org.springframework.web.reactive.function.client.bodyToMono
 
 class TestClient(private val client: WebClient) {
