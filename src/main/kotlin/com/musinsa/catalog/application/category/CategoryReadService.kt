@@ -1,11 +1,15 @@
 package com.musinsa.catalog.application.category
 
+import com.musinsa.catalog.application.cache.CacheKey
+import com.musinsa.catalog.application.cache.CacheService
+import com.musinsa.catalog.application.cache.getOrSet
 import com.musinsa.catalog.domain.category.CategoryRepository
 import org.springframework.stereotype.Service
 
 @Service
 class CategoryReadService(
     private val repository: CategoryRepository,
+    private val cacheService: CacheService
 ) {
 
     fun findCategories(cid: Int): CategoryNode? {
@@ -17,7 +21,9 @@ class CategoryReadService(
     }
 
     private fun getCategoryTree(): CategoryTree {
-        return CategoryTree(repository.findAllByEnabledTrue())
+        val categories = cacheService.getOrSet(CacheKey.allCategories) {
+            repository.findAllByEnabledTrue()
+        }
+        return CategoryTree(categories)
     }
-
 }
