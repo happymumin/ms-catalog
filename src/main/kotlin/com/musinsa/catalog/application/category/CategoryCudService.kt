@@ -2,6 +2,7 @@ package com.musinsa.catalog.application.category
 
 import com.musinsa.catalog.application.cache.CacheKey
 import com.musinsa.catalog.application.cache.CacheService
+import com.musinsa.catalog.common.exception.ErrorCode
 import com.musinsa.catalog.common.exception.badRequestException
 import com.musinsa.catalog.common.exception.notFoundException
 import com.musinsa.catalog.domain.category.Category
@@ -21,7 +22,7 @@ class CategoryCudService(
 
     fun create(request: CategoryRequest): Category {
         val parentCategory = request.parentId?.let {
-            repository.findByIdAndEnabledTrue(it) ?: throw badRequestException("잘못된 부모 카테고리입니다.")
+            repository.findByIdAndEnabledTrue(it) ?: throw notFoundException(ErrorCode.NOT_FOUND_PARENT_CATEGORY)
         }
         try {
             val category = repository.save(
@@ -36,15 +37,16 @@ class CategoryCudService(
             cacheService.invalidate(CacheKey.allCategories)
             return category
         } catch (e: DataIntegrityViolationException) {
-            throw badRequestException("동일한 코드의 카테고리가 존재합니다.")
+            throw badRequestException(ErrorCode.DUPLICATED_CATEGORY_CODE)
         }
     }
 
     fun delete(cid: Int) {
         transactionOperations.execute {
-            val category = repository.findByIdAndEnabledTrue(cid) ?: throw notFoundException("존재하지 않는 카테고리입니다.")
+            val category =
+                repository.findByIdAndEnabledTrue(cid) ?: throw notFoundException(ErrorCode.NOT_FOUND_CATEGORY)
             if (repository.countByCodeStartsWithAndEnabledTrue(category.code.value) > 1) {
-                throw badRequestException("리프 카테고리만 제거 가능합니다.")
+                throw badRequestException(ErrorCode.PARENT_CATEGORY_CAN_NOT_DELETE)
             }
             category.enabled = false
         }
@@ -53,10 +55,12 @@ class CategoryCudService(
 
     fun update(cid: Int, request: CategoryRequest) {
         transactionOperations.execute {
-            val category = repository.findByIdAndEnabledTrue(cid) ?: throw notFoundException("존재하지 않는 카테고리입니다.")
+            val category =
+                repository.findByIdAndEnabledTrue(cid) ?: throw notFoundException(ErrorCode.NOT_FOUND_CATEGORY)
 
             val parentCategory: Category? = request.parentId?.let { parentId ->
-                repository.findByIdAndEnabledTrue(parentId) ?: throw badRequestException("잘못된 부모 카테고리입니다.")
+                repository.findByIdAndEnabledTrue(parentId)
+                    ?: throw notFoundException(ErrorCode.NOT_FOUND_PARENT_CATEGORY)
             }
 
             val newCode = CategoryCode.of(request.code, parentCategory?.code)
@@ -84,18 +88,18 @@ class CategoryCudService(
                 beforeModifiedAt = category.modifiedAt
             )
         } catch (e: DataIntegrityViolationException) {
-            throw badRequestException("동일한 코드의 카테고리가 존재합니다.")
+            throw badRequestException(ErrorCode.DUPLICATED_CATEGORY_CODE)
         }
-        if (updatedCount != 1) throw badRequestException("카테고리 변경에 실패했습니다.")
+        if (updatedCount != 1) throw badRequestException(ErrorCode.FAILED_UPDATE_CATEGORY)
     }
 
     private fun updateCodeOnly(category: Category, code: CategoryCode) {
         val updatedCount = try {
             repository.updateCodeOnly(id = category.id!!, code = code.value, beforeModifiedAt = category.modifiedAt)
         } catch (e: DataIntegrityViolationException) {
-            throw badRequestException("동일한 코드의 카테고리가 존재합니다.")
+            throw badRequestException(ErrorCode.DUPLICATED_CATEGORY_CODE)
         }
-        if (updatedCount != 1) throw badRequestException("code 변경에 실패했습니다.")
+        if (updatedCount != 1) throw badRequestException(ErrorCode.FAILED_UPDATE_CATEGORY_CODE)
     }
 
 }

@@ -6,7 +6,7 @@ object Response {
             fun empty() = Ok(Unit)
         }
     }
-    data class Error(val message: String)
+    data class Error(val message: String, val errorCode: String? = null)
 }
 
 fun <T> T.wrapOk() = Response.Ok(this)

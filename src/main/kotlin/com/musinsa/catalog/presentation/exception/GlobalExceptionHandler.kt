@@ -16,7 +16,7 @@ class GlobalExceptionHandler {
     @ExceptionHandler(AppException::class)
     fun handle(e: AppException): ResponseEntity<Response.Error> {
         logger.debug { e }
-        return ResponseEntity.status(e.httpStatus).body(Response.Error(e.message))
+        return ResponseEntity.status(e.httpStatus).body(Response.Error(e.message, e.errorCode?.name))
     }
 
     @ExceptionHandler(HttpMessageNotReadableException::class)
